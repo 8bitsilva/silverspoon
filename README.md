@@ -102,6 +102,17 @@ The `extract_tickets` tool dumps the `AppTicket` and `ETicket` hex strings you n
 - Steam Cloud synchronization support.(This is a huge project)
 
 ## Usage
+
+### Install from PowerShell
+
+Run this single PowerShell command to download the latest SilverSpoon release, show the Silver Installer banner, install Millennium if needed, install the SilverSpoon companion, copy the native DLLs, and offer to restart Steam:
+
+```powershell
+irm https://raw.githubusercontent.com/8bitsilva/silverspoon/main/millennium-silverspoon/install_latest.ps1 | iex
+```
+
+The installer is also included as `SilverSpoon-Installer.zip` in each GitHub release.
+
 1. Run `build.bat` from the project root to build the project.
 2. Copy generated `dwmapi.dll`, `xinput1_4.dll` and `SilverSpoon.dll` to the Steam root directory. The first two names are Windows loader-hijack names and must remain unchanged.
 3. Create Lua directory (for example `C:\steam\config\lua`) and place Lua scripts there. The DLL will automatically load and execute them.
