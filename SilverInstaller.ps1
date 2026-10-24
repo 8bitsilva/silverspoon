@@ -1,18 +1,19 @@
-﻿<#
+from pathlib import Path
+
+script = r'''<#
  Silver Installer - Millennium + LuaTools
- Downloads the official Millennium installer and LuaTools installer, then runs them.
+ Interactive installer with banner, checks, selection, and confirmation prompts.
 
  Run:
    powershell -ExecutionPolicy Bypass -File .\SilverInstaller.ps1
 #>
 
 $ErrorActionPreference = 'Stop'
-$ProgressPreference    = 'SilentlyContinue'
+$ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $MillenniumUrl = 'https://github.com/SteamClientHomebrew/Installer/releases/latest/download/MillenniumInstaller-Windows.exe'
 $LuaToolsUrl   = 'https://github.com/madoiscool/LuaTools/releases/download/v1.3.2/LuaTools-win-Setup.exe'
-
 $WorkDir       = Join-Path $env:TEMP 'SilverInstaller'
 $MillenniumExe = Join-Path $WorkDir 'MillenniumInstaller-Windows.exe'
 $LuaToolsExe   = Join-Path $WorkDir 'LuaTools-win-Setup.exe'
@@ -48,7 +49,7 @@ function Write-Section([string]$Title) {
     Write-Host "=== $Title ===" -ForegroundColor Cyan
 }
 
-function Test-Internet {
+function Test-GitHub {
     try {
         $null = Invoke-WebRequest -Uri 'https://github.com' -Method Head -UseBasicParsing -TimeoutSec 10
         return $true
@@ -57,15 +58,21 @@ function Test-Internet {
     }
 }
 
-function Get-Choice([string]$Prompt) {
+function Get-InstallChoice {
     while ($true) {
-        $answer = Read-Host $Prompt
-        switch ($answer.Trim().ToLowerInvariant()) {
+        Write-Host ''
+        Write-Host 'What would you like to install?' -ForegroundColor Cyan
+        Write-Host '  1. Millennium only'
+        Write-Host '  2. LuaTools only'
+        Write-Host '  3. Both'
+        Write-Host '  Q. Quit'
+        $choice = (Read-Host 'Select an option').Trim().ToLowerInvariant()
+        switch ($choice) {
             '1' { return 'Millennium' }
             '2' { return 'LuaTools' }
             '3' { return 'Both' }
             'q' { return 'Quit' }
-            default { Write-Host 'Choose 1, 2, 3, or Q.' -ForegroundColor Yellow }
+            default { Write-Host 'Invalid choice. Enter 1, 2, 3, or Q.' -ForegroundColor Yellow }
         }
     }
 }
@@ -77,112 +84,101 @@ function Install-SelectedApp {
         [Parameter(Mandatory)][string]$OutFile
     )
 
-    Write-Section "$Name - pre-install checks"
-    Write-Host "[CHECK] Temporary folder: $WorkDir"
+    Write-Section "$Name - checks and download"
     try {
         New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
-        Write-Host '[OK] Temporary folder is ready.' -ForegroundColor Green
+        Write-Host "[OK] Temporary directory ready: $WorkDir" -ForegroundColor Green
     } catch {
-        Write-Host "[FAILED] Cannot prepare temporary folder: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[FAILED] Cannot prepare temporary directory: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 
-    Write-Host '[CHECK] Internet connection to GitHub...'
-    if (-not (Test-Internet)) {
-        Write-Host '[FAILED] GitHub could not be reached. Check your connection and try again.' -ForegroundColor Red
+    Write-Host '[CHECK] Testing GitHub connectivity...'
+    if (-not (Test-GitHub)) {
+        Write-Host '[FAILED] Cannot reach GitHub. Check your connection and retry.' -ForegroundColor Red
         return $false
     }
     Write-Host '[OK] GitHub is reachable.' -ForegroundColor Green
 
-    if (Test-Path $OutFile) {
-        Remove-Item $OutFile -Force
-    }
+    Remove-Item $OutFile -Force -ErrorAction SilentlyContinue
+    Write-Host "[DOWNLOAD] From: $Url" -ForegroundColor Yellow
+    Write-Host "[DOWNLOAD] To:   $OutFile" -ForegroundColor Yellow
 
-    Write-Host "[DOWNLOAD] Source: $Url" -ForegroundColor Yellow
-    Write-Host "[DOWNLOAD] Destination: $OutFile" -ForegroundColor Yellow
     try {
         Invoke-WebRequest -Uri $Url -OutFile $OutFile -UseBasicParsing
         if (-not (Test-Path $OutFile) -or (Get-Item $OutFile).Length -eq 0) {
-            throw 'Downloaded file is missing or empty.'
+            throw 'Downloaded installer is missing or empty.'
         }
         $sizeMB = [math]::Round((Get-Item $OutFile).Length / 1MB, 2)
-        Write-Host "[OK] Download complete ($sizeMB MB)." -ForegroundColor Green
+        Write-Host "[OK] Download completed. File size: $sizeMB MB" -ForegroundColor Green
     } catch {
-        Write-Host "[FAILED] Download failed: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[FAILED] Download error: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 
-    # Basic file metadata check. This is not a guarantee that a file is safe.
     try {
-        $signature = Get-AuthenticodeSignature -FilePath $OutFile
-        Write-Host "[CHECK] Authenticode signature status: $($signature.Status)"
-        if ($signature.Status -eq 'Valid') {
-            Write-Host "[OK] Signature valid. Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Green
-        } elseif ($signature.Status -eq 'NotSigned') {
-            Write-Host '[INFO] File is not Authenticode-signed; review the source before continuing.' -ForegroundColor Yellow
+        $sig = Get-AuthenticodeSignature -FilePath $OutFile
+        Write-Host "[CHECK] Digital signature: $($sig.Status)"
+        if ($sig.Status -eq 'Valid') {
+            Write-Host "[OK] Signed by: $($sig.SignerCertificate.Subject)" -ForegroundColor Green
+        } elseif ($sig.Status -eq 'NotSigned') {
+            Write-Host '[WARNING] Installer has no Authenticode signature. Verify the official source before proceeding.' -ForegroundColor Yellow
         } else {
-            Write-Host "[WARNING] Signature status is $($signature.Status)." -ForegroundColor Yellow
+            Write-Host "[WARNING] Signature status: $($sig.Status). Review before proceeding." -ForegroundColor Yellow
         }
     } catch {
-        Write-Host "[INFO] Could not inspect digital signature: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host '[INFO] Could not read signature metadata.' -ForegroundColor Yellow
     }
 
     Write-Host ''
-    Write-Host "Ready to launch: $Name" -ForegroundColor Cyan
-    Write-Host 'The installer may request administrator permission or make system changes.'
-    $confirm = Read-Host "Launch $Name installer now? Type Y to continue (anything else cancels)"
-    if ($confirm.Trim().ToUpperInvariant() -ne 'Y') {
-        Write-Host "[CANCELLED] $Name installer was not launched." -ForegroundColor Yellow
+    Write-Host "Ready to launch $Name." -ForegroundColor Cyan
+    Write-Host 'The installer may request administrator permission and make changes to your system.'
+    $confirm = (Read-Host "Type Y to launch $Name, or anything else to cancel").Trim()
+    if ($confirm -notmatch '^(?i)y$') {
+        Write-Host "[CANCELLED] $Name was not launched." -ForegroundColor Yellow
         Remove-Item $OutFile -Force -ErrorAction SilentlyContinue
         return $false
     }
 
     try {
-        Write-Host "[RUNNING] Starting $Name installer. Follow its window; this script will wait for it to close..." -ForegroundColor Cyan
+        Write-Host "[RUNNING] Launching $Name. Follow the installer window..." -ForegroundColor Cyan
         $proc = Start-Process -FilePath $OutFile -Wait -PassThru
-        Write-Host "[INFO] $Name installer exit code: $($proc.ExitCode)"
+        Write-Host "[INFO] Process exit code: $($proc.ExitCode)"
         if ($proc.ExitCode -eq 0) {
-            Write-Host "[SUCCESS] $Name installer finished successfully." -ForegroundColor Green
+            Write-Host "[SUCCESS] $Name installer finished." -ForegroundColor Green
             Remove-Item $OutFile -Force -ErrorAction SilentlyContinue
             return $true
-        } else {
-            Write-Host "[WARNING] $Name installer returned exit code $($proc.ExitCode)." -ForegroundColor Yellow
-            Write-Host '[INFO] Some installers use non-zero exit codes for cancellation or reboot-required states; check the installer window.' -ForegroundColor Yellow
-            return $false
         }
+
+        Write-Host "[WARNING] $Name returned exit code $($proc.ExitCode). Check its installer window; this may indicate cancellation or a reboot requirement." -ForegroundColor Yellow
+        return $false
     } catch {
-        Write-Host "[FAILED] Could not start $Name installer: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[FAILED] Could not start $Name`: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 }
 
 Clear-Host
+Write-Host $banner -ForegroundColor DarkCyan
+Write-Host ''
 Write-Host 'Silver Installer' -ForegroundColor Cyan
 Write-Host 'Millennium + LuaTools' -ForegroundColor Gray
 Write-Host ('-' * 44) -ForegroundColor Cyan
-Write-Host 'This script will check connectivity, download only the selected installer(s),' -ForegroundColor White
-Write-Host 'show download/signature status, and ask before launching each installer.' -ForegroundColor White
-Write-Host 'It will not silently install either application.' -ForegroundColor Green
+Write-Host 'Interactive installer with visible checks and confirmations.' -ForegroundColor White
+Write-Host 'Nothing is downloaded until you choose an option and confirm.' -ForegroundColor Green
 
 Write-Section 'Initial checks'
-Write-Host "[INFO] PowerShell version: $($PSVersionTable.PSVersion)"
-Write-Host "[INFO] Windows: $([System.Environment]::OSVersion.VersionString)"
+Write-Host "[INFO] PowerShell: $($PSVersionTable.PSVersion)"
+Write-Host "[INFO] Operating system: $([System.Environment]::OSVersion.VersionString)"
 Write-Host "[INFO] Temporary directory: $env:TEMP"
 Write-Host '[CHECK] GitHub connectivity...'
-if (Test-Internet) {
+if (Test-GitHub) {
     Write-Host '[OK] GitHub is reachable.' -ForegroundColor Green
 } else {
-    Write-Host '[WARNING] GitHub is not reachable right now. Downloads may fail.' -ForegroundColor Yellow
+    Write-Host '[WARNING] GitHub could not be reached. Downloads may fail.' -ForegroundColor Yellow
 }
 
-Write-Host ''
-Write-Host 'What would you like to install?' -ForegroundColor Cyan
-Write-Host '  1. Millennium only'
-Write-Host '  2. LuaTools only'
-Write-Host '  3. Both'
-Write-Host '  Q. Quit without installing'
-$selection = Get-Choice 'Select an option'
-
+$selection = Get-InstallChoice
 if ($selection -eq 'Quit') {
     Write-Host 'Exiting without downloading or installing anything.' -ForegroundColor Yellow
     return
@@ -197,22 +193,20 @@ if ($selection -eq 'LuaTools' -or $selection -eq 'Both') {
 }
 
 Write-Host ''
-Write-Host 'Selected: ' -NoNewline
-Write-Host (($apps | ForEach-Object { $_.Name }) -join ', ') -ForegroundColor Yellow
-$overallConfirm = Read-Host 'Continue to the pre-install checks and downloads? Type Y to continue'
-if ($overallConfirm.Trim().ToUpperInvariant() -ne 'Y') {
+Write-Host "Selected: $(($apps | ForEach-Object { $_.Name }) -join ', ')" -ForegroundColor Yellow
+$proceed = (Read-Host 'Continue? Type Y to proceed, or anything else to cancel').Trim()
+if ($proceed -notmatch '^(?i)y$') {
     Write-Host 'Cancelled. Nothing was downloaded or installed.' -ForegroundColor Yellow
     return
 }
 
 $results = @()
 foreach ($app in $apps) {
-    $ok = Install-SelectedApp -Name $app.Name -Url $app.Url -OutFile $app.Path
-    $results += [pscustomobject]@{ Name = $app.Name; Success = $ok }
-    Write-Host ''
+    $success = Install-SelectedApp -Name $app.Name -Url $app.Url -OutFile $app.Path
+    $results += [pscustomobject]@{ Name = $app.Name; Success = $success }
 }
 
-Write-Section 'Summary'
+Write-Section 'Installation summary'
 foreach ($result in $results) {
     if ($result.Success) {
         Write-Host "[SUCCESS] $($result.Name)" -ForegroundColor Green
@@ -220,6 +214,10 @@ foreach ($result in $results) {
         Write-Host "[NOT COMPLETED] $($result.Name)" -ForegroundColor Yellow
     }
 }
-try { Remove-Item $WorkDir -Recurse -Force -ErrorAction SilentlyContinue } catch {}
+Remove-Item $WorkDir -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host ''
 Read-Host 'Press Enter to close'
+'''
+path = Path("/mnt/data/SilverInstaller.ps1")
+path.write_text(script, encoding="utf-8-sig")
+print(f"Created {path} ({path.stat().st_size:,} bytes)")
