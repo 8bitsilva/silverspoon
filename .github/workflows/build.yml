@@ -10,6 +10,7 @@ jobs:
   build:
     name: Build .NET 8 WPF App
     runs-on: windows-latest
+    needs: build-native
 
     steps:
       - name: Checkout
@@ -32,6 +33,30 @@ jobs:
           name: silverspoon-desktop
           path: |
             src/bin/Release/net8.0-windows/**/*
+          retention-days: 7
+
+      - name: Download native artifacts for installer
+        uses: actions/download-artifact@v4
+        with:
+          name: silverspoon-native
+          path: artifacts/native
+
+      - name: Package SilverSpoon installer bundle
+        shell: pwsh
+        run: |
+          $package = Join-Path $env:GITHUB_WORKSPACE 'artifacts/SilverSpoon'
+          New-Item -ItemType Directory -Path $package -Force | Out-Null
+          Get-ChildItem (Join-Path $env:GITHUB_WORKSPACE 'artifacts/native') -Filter '*.dll' -Recurse | Copy-Item -Destination $package
+          Copy-Item 'src/bin/Release/net8.0-windows/SilverSpoon.exe' $package
+          Copy-Item 'millennium-silverspoon/install_silverspoon.lua' $package
+          Copy-Item 'millennium-silverspoon/install_silverspoon.ps1' $package
+          Copy-Item 'millennium-silverspoon/SilverSpoon-Store-Companion.zip' $package
+
+      - name: Upload installer bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: silverspoon-installer
+          path: artifacts/SilverSpoon/**
           retention-days: 7
 
   build-native:
