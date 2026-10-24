@@ -31,12 +31,15 @@ jobs:
       - name: Build Release
         run: dotnet build .\src\LuaToolsGui.csproj --configuration Release --no-restore
 
+      - name: Publish self-contained Windows EXE
+        run: dotnet publish .\src\LuaToolsGui.csproj --configuration Release --no-restore --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: silverspoon-desktop
           path: |
-            src/bin/Release/net8.0-windows/**/*
+            src/bin/Release/net8.0-windows/win-x64/publish/**/*
           retention-days: 7
 
       - name: Download native artifacts for installer
@@ -51,7 +54,7 @@ jobs:
           $package = Join-Path $env:GITHUB_WORKSPACE 'artifacts/SilverSpoon'
           New-Item -ItemType Directory -Path $package -Force | Out-Null
           Get-ChildItem (Join-Path $env:GITHUB_WORKSPACE 'artifacts/native') -Filter '*.dll' -Recurse | Copy-Item -Destination $package
-          Copy-Item 'src/bin/Release/net8.0-windows/SilverSpoon.exe' $package
+          Copy-Item 'src/bin/Release/net8.0-windows/win-x64/publish/SilverSpoon.exe' $package
           Copy-Item 'millennium-silverspoon/install_silverspoon.lua' $package
           Copy-Item 'millennium-silverspoon/install_silverspoon.ps1' $package
           Copy-Item 'millennium-silverspoon/install_latest.ps1' $package
