@@ -9,7 +9,6 @@
     xmlns:vm="clr-namespace:LuaToolsGui.ViewModels"
     xmlns:views="clr-namespace:LuaToolsGui.Views"
     Title="SilverSpoon"
-    Icon="icon.ico"
     Width="1080"
     Height="720"
     MinWidth="760"
@@ -28,9 +27,6 @@
         </Grid.RowDefinitions>
 
         <ui:TitleBar Grid.Row="0" Title="SilverSpoon">
-            <ui:TitleBar.Icon>
-                <ui:ImageIcon Source="pack://application:,,,/icon.ico" />
-            </ui:TitleBar.Icon>
         </ui:TitleBar>
 
         <Grid Grid.Row="1">

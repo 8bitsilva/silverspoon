@@ -35,13 +35,6 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private void InitializeTrayIcon()
     {
         _trayIcon = new System.Windows.Forms.NotifyIcon { Text = "SilverSpoon", Visible = false };
-        try
-        {
-            using var stream = Application.GetResourceStream(new Uri("pack://application:,,,/icon.ico"))?.Stream;
-            if (stream is not null) _trayIcon.Icon = new System.Drawing.Icon(stream);
-        }
-        catch { /* fall back to no icon. Tray menu still works */ }
-
         _trayIcon.DoubleClick += (_, _) => RestoreFromTray();
 
         var menu = new System.Windows.Forms.ContextMenuStrip();
