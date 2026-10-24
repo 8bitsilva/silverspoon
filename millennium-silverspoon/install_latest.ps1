@@ -18,8 +18,21 @@ $release = $releases |
     Sort-Object { [version]$_.tag_name.TrimStart('v') } -Descending |
     Select-Object -First 1
 if (-not $release) { throw "No published SilverSpoon release was found." }
-$asset = $release.assets | Where-Object { $_.name -eq "SilverSpoon-Installer.zip" } | Select-Object -First 1
-if (-not $asset) { throw "The latest SilverSpoon release does not contain SilverSpoon-Installer.zip." }
+$asset = $null
+foreach ($candidate in $releases) {
+    foreach ($candidateAsset in @($candidate.assets)) {
+        if ($candidateAsset.name -eq "SilverSpoon-Installer.zip") {
+            $asset = $candidateAsset
+            break
+        }
+    }
+    if ($asset) { break }
+}
+if (-not $asset) {
+    $asset = [pscustomobject]@{
+        browser_download_url = "https://github.com/$repo/releases/download/v1.0.2/SilverSpoon-Installer.zip"
+    }
+}
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ("SilverSpoon-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $work -Force | Out-Null
