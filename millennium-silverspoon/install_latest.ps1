@@ -1,19 +1,17 @@
 $ErrorActionPreference = "Stop"
+$repo = "8bitsilva/silverspoon"
 
-@"
-   _____ _ _                 _____                         
-  / ____(_) |               / ____|                        
- | (___  _| |__   ___ _ __ | (___  _ __   ___   ___  _ __ 
-  \___ \| | '_ \ / _ \ '__| \___ \| '_ \ / _ \ / _ \| '_ \
-  ____) | | | | |  __/ |    ____) | |_) | (_) | (_) | | | |
- |_____/|_|_| |_|\___|_|   |_____/| .__/ \___/ \___/|_| |_|
-                                  | |                      
-                                  |_|                      
-"@ | Write-Host
+try {
+    $template = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/$repo/main/millennium-silverspoon/install_silverspoon.lua" -UseBasicParsing
+    if ($template.Content -match '(?s)local banner = \[=\[(.*?)\]=\]') {
+        Write-Host $matches[1]
+    }
+} catch {
+    Write-Host "Silver Installer"
+}
 Write-Host "Silver Installer"
 Write-Host "----------------------------------------"
 
-$repo = "8bitsilva/silverspoon"
 $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest" -Headers @{ "User-Agent" = "SilverSpoon-Installer" }
 $asset = $release.assets | Where-Object { $_.name -eq "SilverSpoon-Installer.zip" } | Select-Object -First 1
 if (-not $asset) { throw "The latest SilverSpoon release does not contain SilverSpoon-Installer.zip." }
