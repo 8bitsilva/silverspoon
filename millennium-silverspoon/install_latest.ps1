@@ -12,32 +12,12 @@ try {
 Write-Host "Silver Installer"
 Write-Host "----------------------------------------"
 
-$releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases?per_page=30" -Headers @{ "User-Agent" = "SilverSpoon-Installer" }
-$release = $releases |
-    Where-Object { -not $_.draft -and -not $_.prerelease -and $_.tag_name -match '^v\d+\.\d+\.\d+$' } |
-    Sort-Object { [version]$_.tag_name.TrimStart('v') } -Descending |
-    Select-Object -First 1
-if (-not $release) { throw "No published SilverSpoon release was found." }
-$asset = $null
-foreach ($candidate in $releases) {
-    foreach ($candidateAsset in @($candidate.assets)) {
-        if ($candidateAsset.name -eq "SilverSpoon-Installer.zip") {
-            $asset = $candidateAsset
-            break
-        }
-    }
-    if ($asset) { break }
-}
-if (-not $asset) {
-    $asset = [pscustomobject]@{
-        browser_download_url = "https://github.com/$repo/releases/download/v1.0.2/SilverSpoon-Installer.zip"
-    }
-}
+$assetUrl = "https://github.com/$repo/releases/download/v1.0.2/SilverSpoon-Installer.zip"
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ("SilverSpoon-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $work -Force | Out-Null
 $archive = Join-Path $work "SilverSpoon-Installer.zip"
-Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $archive
+Invoke-WebRequest -Uri $assetUrl -OutFile $archive
 Expand-Archive -LiteralPath $archive -DestinationPath $work -Force
 
 $installer = Join-Path $work "install_silverspoon.ps1"
