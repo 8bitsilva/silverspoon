@@ -42,10 +42,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install CMake
-        uses: lukka/get-cmake@v3
-        with:
-          cmake-version: '3.20'
+      - name: Verify CMake
+        shell: pwsh
+        run: cmake --version
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
