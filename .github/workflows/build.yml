@@ -3,8 +3,12 @@ name: Build SilverSpoon Desktop
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -85,3 +89,23 @@ jobs:
           path: |
             build/Release/*.dll
           retention-days: 7
+
+  release:
+    name: Create GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download installer bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: silverspoon-installer
+          path: release
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" release/* --title "SilverSpoon ${{ github.ref_name }}" --generate-notes
