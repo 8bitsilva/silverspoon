@@ -1,0 +1,65 @@
+name: SilverSpoon Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "codex/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    name: Native DLLs (${{ matrix.config }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [Release, Debug]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        shell: pwsh
+        run: cmake -S src -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build native targets
+        shell: pwsh
+        run: cmake --build build --config ${{ matrix.config }} --target SilverSpoon dwmapi xinput1_4
+
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilverSpoon-native-${{ matrix.config }}
+          path: |
+            build/${{ matrix.config }}/SilverSpoon.dll
+            build/${{ matrix.config }}/dwmapi.dll
+            build/${{ matrix.config }}/xinput1_4.dll
+          if-no-files-found: error
+
+  companion:
+    name: Millennium companion
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: millennium-silverspoon/package-lock.json
+
+      - name: Build and bundle companion
+        shell: pwsh
+        working-directory: millennium-silverspoon
+        run: npm ci; npm run bundle
+
+      - name: Upload companion bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilverSpoon-Store-Companion
+          path: millennium-silverspoon/SilverSpoon-Store-Companion.zip
+          if-no-files-found: error
