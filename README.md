@@ -108,7 +108,7 @@ The `extract_tickets` tool dumps the `AppTicket` and `ETicket` hex strings you n
 Run this single PowerShell command to download the latest SilverSpoon release, show the Silver Installer banner, install Millennium if needed, install the SilverSpoon companion, copy the native DLLs, and offer to restart Steam:
 
 ```powershell
-irm https://raw.githubusercontent.com/8bitsilva/silverspoon/main/millennium-silverspoon/install_latest.ps1 | iex
+irm "https://raw.githubusercontent.com/8bitsilva/silverspoon/main/millennium-silverspoon/install_latest.ps1?v=8921965" | iex
 ```
 
 The installer is also included as `SilverSpoon-Installer.zip` in each GitHub release.
