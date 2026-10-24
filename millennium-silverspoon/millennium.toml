@@ -1,0 +1,15 @@
+[plugin]
+id = "com.silverspoon.store-companion"
+name = "SilverSpoon Store Companion"
+version = "1.0.0"
+author = "SilverSpoon"
+description = "Adds a lightweight SilverSpoon panel to Steam game store pages."
+
+[assets]
+resources = ["resources/**/*"]
+
+[webkit]
+entry = "webview/preload.ts"
+
+[compiler]
+output_path = "./dist"

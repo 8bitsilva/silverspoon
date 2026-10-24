@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="docs/logo-animated.svg" width="180" alt="OpenSteamTool logo">
+  <img src="docs/logo-animated.svg" width="180" alt="SilverSpoon logo">
 
-  <h1>OpenSteamTool</h1>
+  <h1>SilverSpoon</h1>
 
   <p>
     <strong>Open-Source Steam Unlock Tool</strong>
@@ -103,7 +103,7 @@ The `extract_tickets` tool dumps the `AppTicket` and `ETicket` hex strings you n
 
 ## Usage
 1. Run `build.bat` from the project root to build the project.
-2. Copy generated `dwmapi.dll`, `xinput1_4.dll` and `OpenSteamTool.dll` to the Steam root directory.
+2. Copy generated `dwmapi.dll`, `xinput1_4.dll` and `SilverSpoon.dll` to the Steam root directory. The first two names are Windows loader-hijack names and must remain unchanged.
 3. Create Lua directory (for example `C:\steam\config\lua`) and place Lua scripts there. The DLL will automatically load and execute them.
 4. Lua example:
 ```lua
@@ -263,8 +263,25 @@ build.bat
 ```
 
 ### Output
-- Debug: `build/Debug/OpenSteamTool.dll`, `build/Debug/dwmapi.dll`, `build/Debug/xinput1_4.dll`
-- Release: `build/Release/OpenSteamTool.dll`, `build/Release/dwmapi.dll`, `build/Release/xinput1_4.dll`
+- Debug: `build/Debug/SilverSpoon.dll`, `build/Debug/dwmapi.dll`, `build/Debug/xinput1_4.dll`
+- Release: `build/Release/SilverSpoon.dll`, `build/Release/dwmapi.dll`, `build/Release/xinput1_4.dll`
 
 ## Disclaimer
 This project is provided for research and educational purposes only. You are responsible for complying with local laws, platform terms of service, and software licenses.
+
+## SilverSpoon Host Integration
+This project (OpenSteamTool) is integrated with the SilverSpoon desktop host, a .NET WPF application that provides additional features:
+
+- Depot downloading via Builds page
+- Unlocker mode selection (OST/Bst/Custom) with auto-detect and install/switch
+- SteamAutoCrack launching with runtime installation
+- Steamless DRM removal from Manage page
+- Plugin installation from store pages
+- Game library management and live refresh
+- Mode status display on Home dashboard
+- Protocol URL handling (luatools://)
+- Discord key donation support
+
+### Credits
+- **SilverSpoon desktop host**: LuaToolsGui project - https://github.com/Seyric/LuaToolsGui
+- **Millennium companion**: Millennium Store Companion - https://github.com/millennium-silverspoon/millennium-store-companion

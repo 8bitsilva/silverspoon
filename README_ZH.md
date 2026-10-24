@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="docs/logo-animated.svg" width="180" alt="OpenSteamTool logo">
+  <img src="docs/logo-animated.svg" width="180" alt="SilverSpoon logo">
 
-  <h1>OpenSteamTool</h1>
+  <h1>SilverSpoon</h1>
 
   <p>
     <strong>开源 Steam 解锁工具</strong>
@@ -99,12 +99,29 @@
 - 在 Steam 启动参数中添加 `-onlinefix` 以在需要使用大厅匹配的游戏里启用基于 480 的在线游戏。当前限制是同一时间只能运行一个这样的游戏。要撤销，只需从启动参数中移除 `-onlinefix` — 下次启动时在线游戏恢复正常
 
 ## 未来计划
-- Steam 云同步支持。（这是个超级大工程）
+- Steam 云同步支持。（这是个超级大工程）。
+
+### SilverSpoon host 集成
+此项目 (OpenSteamTool) 与 SilverSpoon 桌面主机集成，一个应用程序 .NET WPF 提供以下功能：
+
+- 通过 Builds 页面进行仓库下载
+- 解锁器模式选择 (OST/Bst/Custom) 与 auto-detect 和 install/switch
+- SteamAutoCrack launching with runtime installation
+- Steamless DRM removal from Manage 页面
+- 插件安装从商店页面
+- 游戏库管理和实时刷新
+- 主界面 Home 面板上的模式状态显示
+- 协议 URL 处理 (luatools://)
+- 支持捐赠钥匙的 Discord
+
+### 致谢
+- **SilverSpoon 桌面主机**: LuaToolsGui 项目 - https://github.com/Seyric/LuaToolsGui
+- **Millennium 伙伴**: Millennium Store Companion - https://github.com/millennium-silverspoon/millennium-store-companion
 
 ## 使用方法
 
 1. 在项目根目录运行 `build.bat` 构建项目
-2. 将生成的 `dwmapi.dll`、`xinput1_4.dll` 和 `OpenSteamTool.dll` 复制到 Steam 根目录
+2. 将生成的 `dwmapi.dll`、`xinput1_4.dll` 和 `SilverSpoon.dll` 复制到 Steam 根目录。前两个名称是 Windows 加载所需的固定名称，必须保持不变。
 3. 创建 Lua 目录（例如 `C:\steam\config\lua`）并将 Lua 脚本放在那里。DLL 会自动加载并执行它们
 4. Lua 示例：
 ```lua
@@ -264,8 +281,8 @@ build.bat
 ```
 
 ### 输出
-- Debug：`build/Debug/OpenSteamTool.dll`、`build/Debug/dwmapi.dll`、`build/Debug/xinput1_4.dll`
-- Release：`build/Release/OpenSteamTool.dll`、`build/Release/dwmapi.dll`、`build/Release/xinput1_4.dll`
+- Debug：`build/Debug/SilverSpoon.dll`、`build/Debug/dwmapi.dll`、`build/Debug/xinput1_4.dll`
+- Release：`build/Release/SilverSpoon.dll`、`build/Release/dwmapi.dll`、`build/Release/xinput1_4.dll`
 
 ## 免责声明
 本项目仅供研究和教育目的使用。你负责遵守当地法律、平台服务条款和软件许可证。

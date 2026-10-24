@@ -109,7 +109,7 @@
 #pragma comment(linker, "/EXPORT:#187=DWMAPI.#187,@187,NONAME")
 
 // Only inject when the host process is steam.exe (case-insensitive).
-// LoadLibraryA itself guarantees that OpenSteamTool.dll's DllMain
+// LoadLibraryA itself guarantees that SilverSpoon.dll's DllMain
 // runs at most once per process, so multiple hijack DLLs can safely
 // call this without additional synchronisation.
 BOOL OpenSteamToolLoad()
@@ -122,7 +122,7 @@ BOOL OpenSteamToolLoad()
         if (_stricmp(exeName, "steam.exe") != 0)
             return TRUE;   // not Steam — let the proxy load, but don't inject
     }
-    return LoadLibraryA("OpenSteamTool.dll") != NULL;
+    return LoadLibraryA("SilverSpoon.dll") != NULL;
 }
 
 

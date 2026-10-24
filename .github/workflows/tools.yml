@@ -26,11 +26,11 @@ jobs:
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OpenSteamTool-Tools-Release
+          name: SilverSpoon-Tools-Release
           path: build/tools/Release/
 
       - name: Upload Debug artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OpenSteamTool-Tools-Debug
+          name: SilverSpoon-Tools-Debug
           path: build/tools/Debug/

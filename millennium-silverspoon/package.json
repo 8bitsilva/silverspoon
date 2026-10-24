@@ -1,0 +1,14 @@
+{
+  "name": "silverspoon-store-companion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SilverSpoon companion panel for Steam store pages.",
+  "scripts": {
+    "build": "starlight pack",
+    "dev": "starlight watch",
+    "bundle": "npm run build -- --release && powershell -NoProfile -ExecutionPolicy Bypass -File ./bundle.ps1"
+  },
+  "devDependencies": {
+    "@steambrew/starlight": "^1.1.3"
+  }
+}

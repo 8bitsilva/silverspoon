@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="docs/logo-animated.svg" width="180" alt="Logo de OpenSteamTool">
+  <img src="docs/logo-animated.svg" width="180" alt="Logotipo de SilverSpoon">
 
-  <h1>OpenSteamTool</h1>
+  <h1>SilverSpoon</h1>
 
   <p>
     <strong>Herramienta de código abierto para desbloquear Steam</strong>
@@ -96,9 +96,26 @@ La herramienta `extract_tickets` vuelca las cadenas hexadecimales de `AppTicket`
 ## Futuro
 - Soporte para la sincronización con Steam Cloud (este es un proyecto enorme).
 
+### Integración con SilverSpoon host
+Este proyecto (OpenSteamTool) se integra con el escritorio SilverSpoon, una aplicación .NET WPF que proporciona características adicionales:
+
+- Descarga de depósitos a través de la página Builds
+- Selección de modo desbloqueador (OST/Bst/Custom) con auto-detección e instalación/cambio
+- Lanzamiento de SteamAutoCrack con instalación de tiempo de ejecución
+- Eliminación de DRM Steamless desde la página Manage
+- Instalación de plugins desde las páginas de la tienda
+- Gestión de biblioteca de juegos y actualización en vivo
+- Visualización del estado del modo en el panel principal Home
+- Manejo de URLs de protocolo (luatools://)
+- Soporte de donación de claves de Discord
+
+### Créditos
+- **Aplicación de escritorio SilverSpoon**: Proyecto LuaToolsGui - https://github.com/Seyric/LuaToolsGui
+- **Compañero Millennium**: Millennium Store Companion - https://github.com/millennium-silverspoon/millennium-store-companion
+
 ## Uso
 1. Ejecuta `build.bat` desde la raíz del proyecto para compilarlo.
-2. Copia los archivos generados `dwmapi.dll`, `xinput1_4.dll` y `OpenSteamTool.dll` al directorio raíz de Steam.
+2. Copia los archivos generados `dwmapi.dll`, `xinput1_4.dll` y `SilverSpoon.dll` al directorio raíz de Steam. Los dos primeros nombres son necesarios para la carga de Windows y deben permanecer sin cambios.
 3. Crea un directorio para Lua (por ejemplo, C:\steam\config\lua) y coloca allí tus scripts de Lua. La DLL los cargará y ejecutará automáticamente.
 4. Ejemplo de Lua:
 ```lua
@@ -256,9 +273,9 @@ build.bat
 ```
 
 ### Archivos de salida
-- Debug: `build/Debug/OpenSteamTool.dll`, `build/Debug/dwmapi.dll`, `build/Debug/xinput1_4.dll`
+- Debug: `build/Debug/SilverSpoon.dll`, `build/Debug/dwmapi.dll`, `build/Debug/xinput1_4.dll`
 
-- Release: `build/Release/OpenSteamTool.dll`, `build/Release/dwmapi.dll`, `build/Release/xinput1_4.dll`
+- Release: `build/Release/SilverSpoon.dll`, `build/Release/dwmapi.dll`, `build/Release/xinput1_4.dll`
 
 ## Descargo de responsabilidad
 Este proyecto se proporciona únicamente con fines de investigación y educativos. Eres responsable de cumplir con las leyes locales, los términos de servicio de la plataforma y las licencias de software correspondientes.

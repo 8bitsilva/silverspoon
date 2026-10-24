@@ -119,7 +119,7 @@ extern "C" {
     }
 }
 
-// ─── 4. OpenSteamTool Injection ───────────────────────────────────
+// ─── 4. SilverSpoon Injection ─────────────────────────────────────
 BOOL OpenSteamToolLoad() {
     char exePath[MAX_PATH];
     if (GetModuleFileNameA(NULL, exePath, MAX_PATH)) {
@@ -127,7 +127,7 @@ BOOL OpenSteamToolLoad() {
         exeName = exeName ? exeName + 1 : exePath;
         if (_stricmp(exeName, "steam.exe") != 0) return TRUE;
     }
-    return LoadLibraryA("OpenSteamTool.dll") != NULL;
+    return LoadLibraryA("SilverSpoon.dll") != NULL;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, PVOID pvReserved) {
