@@ -27,6 +27,9 @@
         </Grid.RowDefinitions>
 
         <ui:TitleBar Grid.Row="0" Title="SilverSpoon">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/silverspoon-icon.png" />
+            </ui:TitleBar.Icon>
         </ui:TitleBar>
 
         <Grid Grid.Row="1">

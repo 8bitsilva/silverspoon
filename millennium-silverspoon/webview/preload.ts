@@ -105,13 +105,7 @@ function mountPanel(): void {
   panel.dataset.appId = appId;
   panel.setAttribute("aria-label", "SilverSpoon store companion");
   panel.innerHTML = `
-    <svg class="ss-mark" viewBox="0 0 512 512" aria-hidden="true">
-      <rect x="20" y="20" width="472" height="472" rx="112" fill="#152033"/>
-      <g fill="#bec7d3" stroke="#f0f4f9" stroke-opacity=".28" stroke-width="3">
-        <ellipse cx="256" cy="176" rx="107" ry="108"/>
-        <path d="M235 254h42l7 77 55 117c4 9-2 19-12 19H185c-10 0-16-10-12-19l55-117z"/>
-      </g>
-    </svg>
+    <img class="ss-mark" src="../resources/silverspoon-icon.png" alt="" aria-hidden="true" />
     <div class="ss-copy">
       <div class="ss-title">SilverSpoon</div>
       <div class="ss-detail">Steam store companion <span class="ss-app-id">· App ${appId}</span></div>

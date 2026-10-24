@@ -17,6 +17,7 @@ New-Item -ItemType Directory -Path (Join-Path $stagePath "resources") -Force | O
 Copy-Item -LiteralPath (Join-Path $projectRoot "README.md"), (Join-Path $projectRoot "millennium.toml"), (Join-Path $projectRoot "package.json"), (Join-Path $projectRoot "package-lock.json"), (Join-Path $projectRoot "bundle.ps1"), (Join-Path $projectRoot "install_silverspoon.lua"), (Join-Path $projectRoot "install_silverspoon.ps1") -Destination $stagePath
 Copy-Item -LiteralPath (Join-Path $projectRoot "webview\preload.ts") -Destination (Join-Path $stagePath "webview\preload.ts")
 Copy-Item -LiteralPath (Join-Path $projectRoot "resources\silverspoon.png") -Destination (Join-Path $stagePath "resources\silverspoon.png")
+Copy-Item -LiteralPath (Join-Path $projectRoot "resources\silverspoon-icon.png") -Destination (Join-Path $stagePath "resources\silverspoon-icon.png")
 Copy-Item -LiteralPath (Join-Path $projectRoot "resources\starlight-win32-x64.exe") -Destination (Join-Path $stagePath "resources\starlight-win32-x64.exe")
 Copy-Item -LiteralPath (Join-Path $projectRoot "resources\STARLIGHT-LICENSE.txt") -Destination (Join-Path $stagePath "resources\STARLIGHT-LICENSE.txt")
 Copy-Item -LiteralPath (Join-Path $projectRoot "dist") -Destination (Join-Path $stagePath "SilverSpoon-Store-Companion.dist")

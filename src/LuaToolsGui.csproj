@@ -34,6 +34,10 @@
     <Page Include="App.xaml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="silverspoon-icon.png" />
+  </ItemGroup>
+
   <!-- Embed icon.ico as a resource so the Window Icon="icon.ico" can resolve it at runtime -->
   <ItemGroup>
   </ItemGroup>
