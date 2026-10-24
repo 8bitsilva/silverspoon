@@ -1,0 +1,63 @@
+name: Build SilverSpoon Desktop
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build .NET 8 WPF App
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore .\src\LuaToolsGui.csproj
+
+      - name: Build Release
+        run: dotnet build .\src\LuaToolsGui.csproj --configuration Release --no-restore
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: silverspoon-desktop
+          path: |
+            src/bin/Release/net8.0-windows/**/*
+          retention-days: 7
+
+  build-native:
+    name: Build SilverSpoon Native (C++)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install CMake
+        uses: lukka/get-cmake@v3
+        with:
+          cmake-version: '3.20'
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build native
+        run: .\build.bat
+        working-directory: .
+
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: silverspoon-native
+          path: |
+            build/Release/*.dll
+          retention-days: 7

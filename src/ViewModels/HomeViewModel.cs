@@ -117,6 +117,19 @@ public partial class HomeViewModel : ObservableObject
         _queue.Enqueue(_jobs.CreateSteamAutoCrackJob());
     }
 
+    /// <summary>Throttled background update probe. Only queues anything if a newer build actually exists.</summary>
+    private async Task CheckSteamAutoCrackUpdateAsync()
+    {
+        // Fire-and-forget off a UI command: an unobserved fault here must never reach the user.
+        try
+        {
+            if (_queue.FindActive("tool:steamautocrack") is not null) return; // one already in flight
+            if (await _sac.IsUpdateAvailableAsync())
+                _queue.Enqueue(_jobs.CreateSteamAutoCrackJob(launchWhenDone: false));
+        }
+        catch { /* background nicety; never surfaces */ }
+    }
+
     /// <summary>Inline install of the store-page plugin from the Home tile (mirrors PluginViewModel.Install):
     /// confirm the Steam restart, install, toast the outcome, then refresh the tile.</summary>
     [RelayCommand]
