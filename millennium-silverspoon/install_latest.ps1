@@ -12,7 +12,12 @@ try {
 Write-Host "Silver Installer"
 Write-Host "----------------------------------------"
 
-$release = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest" -Headers @{ "User-Agent" = "SilverSpoon-Installer" }
+$releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases?per_page=30" -Headers @{ "User-Agent" = "SilverSpoon-Installer" }
+$release = $releases |
+    Where-Object { -not $_.draft -and -not $_.prerelease -and $_.tag_name -match '^v\d+\.\d+\.\d+$' } |
+    Sort-Object { [version]$_.tag_name.TrimStart('v') } -Descending |
+    Select-Object -First 1
+if (-not $release) { throw "No published SilverSpoon release was found." }
 $asset = $release.assets | Where-Object { $_.name -eq "SilverSpoon-Installer.zip" } | Select-Object -First 1
 if (-not $asset) { throw "The latest SilverSpoon release does not contain SilverSpoon-Installer.zip." }
 
